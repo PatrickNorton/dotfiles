@@ -73,7 +73,7 @@ plugins=(
 
 # Source powerlevel9k customisations
 # This has to be before the oh-my-zsh source in order to load symbols properly
-source ~/.pl9k.zsh
+source ~/Projects/dotfiles/.pl9k.zsh
 
 source $ZSH/oh-my-zsh.sh
 
