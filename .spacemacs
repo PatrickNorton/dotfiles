@@ -205,11 +205,11 @@ It should only modify the values of Spacemacs settings."
 
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   ;; dotspacemacs-default-font '("Fira Code"
-   ;;                             :size 12
-   ;;                             :weight normal
-   ;;                             :width normal
-   ;;                             :powerline-scale 1.0)
+   dotspacemacs-default-font '("Fira Code"
+                               :size 12
+                               :weight normal
+                               :width normal
+                               :powerline-scale 1.0)
 
    ;; The leader key (default "SPC")
    dotspacemacs-leader-key "SPC"
@@ -461,43 +461,71 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
-  ;;; Fira Code ligatures
-   (when (window-system)
-     (set-frame-font "Fira Code"))
-   (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
-                  (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
-                  (36 . ".\\(?:>\\)")
-                  (37 . ".\\(?:\\(?:%%\\)\\|%\\)")
-                  (38 . ".\\(?:\\(?:&&\\)\\|&\\)")
-                  (42 . ".\\(?:\\(?:\\*\\*/\\)\\|\\(?:\\*[*/]\\)\\|[*/>]\\)")
-                  (43 . ".\\(?:\\(?:\\+\\+\\)\\|[+>]\\)")
-                  (45 . ".\\(?:\\(?:-[>-]\\|<<\\|>>\\)\\|[<>}~-]\\)")
-                  (46 . ".\\(?:\\(?:\\.[.<]\\)\\|[.=-]\\)")
-                  (47 . ".\\(?:\\(?:\\*\\*\\|//\\|==\\)\\|[*/=>]\\)")
-                  (48 . ".\\(?:x[a-zA-Z]\\)")
-                  (58 . ".\\(?:::\\|[:=]\\)")
-                  (59 . ".\\(?:;;\\|;\\)")
-                  (60 . ".\\(?:\\(?:!--\\)\\|\\(?:~~\\|->\\|\\$>\\|\\*>\\|\\+>\\|--\\|<[<=-]\\|=[<=>]\\||>\\)\\|[*$+~/<=>|-]\\)")
-                  (61 . ".\\(?:\\(?:/=\\|:=\\|<<\\|=[=>]\\|>>\\)\\|[<=>~]\\)")
-                  (62 . ".\\(?:\\(?:=>\\|>[=>-]\\)\\|[=>-]\\)")
-                  (63 . ".\\(?:\\(\\?\\?\\)\\|[:=?]\\)")
-                  (91 . ".\\(?:]\\)")
-                  (92 . ".\\(?:\\(?:\\\\\\\\\\)\\|\\\\\\)")
-                  (94 . ".\\(?:=\\)")
-                  (119 . ".\\(?:ww\\)")
-                  (123 . ".\\(?:-\\)")
-                  (124 . ".\\(?:\\(?:|[=|]\\)\\|[=>|]\\)")
-                  (126 . ".\\(?:~>\\|~~\\|[>=@~-]\\)")
-                  )
-                ))
-     (dolist (char-regexp alist)
-       (set-char-table-range composition-function-table (car char-regexp)
-                             `([,(cdr char-regexp) 0 font-shape-gstring]))))
+  (defun fira-code-mode--make-alist (list)
+    "Generate prettify-symbols alist from LIST."
+    (let ((idx -1))
+      (mapcar
+       (lambda (s)
+         (setq idx (1+ idx))
+         (let* ((code (+ #Xe100 idx))
+                (width (string-width s))
+                (prefix ())
+                (suffix '(?\s (Br . Br)))
+                (n 1))
+           (while (< n width)
+             (setq prefix (append prefix '(?\s (Br . Bl))))
+             (setq n (1+ n)))
+           (cons s (append prefix suffix (list (decode-char 'ucs code))))))
+       list)))
 
-   (setq exec-path (cons "~/.pyenv/shims" exec-path))
+  (defconst fira-code-mode--ligatures
+    '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\"
+      "{-" "[]" "::" ":::" ":=" "!!" "!=" "!==" "-}"
+      "--" "---" "-->" "->" "->>" "-<" "-<<" "-~"
+      "#{" "#[" "##" "###" "####" "#(" "#?" "#_" "#_("
+      ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*"
+      "/**" "/=" "/==" "/>" "//" "///" "&&" "||" "||="
+      "|=" "|>" "^=" "$>" "++" "+++" "+>" "=:=" "=="
+      "===" "==>" "=>" "=>>" "<=" "=<<" "=/=" ">-" ">="
+      ">=>" ">>" ">>-" ">>=" ">>>" "<*" "<*>" "<|" "<|>"
+      "<$" "<$>" "<!--" "<-" "<--" "<->" "<+" "<+>" "<="
+      "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<" "<~"
+      "<~~" "</" "</>" "~@" "~-" "~=" "~>" "~~" "~~>" "%%"
+      "" ":" "+" "+" "*"))
 
-   (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
-   )
+  (defvar fira-code-mode--old-prettify-alist)
+
+  (defun fira-code-mode--enable ()
+    "Enable Fira Code ligatures in current buffer."
+    (setq-local fira-code-mode--old-prettify-alist prettify-symbols-alist)
+    (setq-local prettify-symbols-alist (fira-code-mode--make-alist fira-code-mode--ligatures))
+    (prettify-symbols-mode t))
+
+  (defun fira-code-mode--disable ()
+    "Disable Fira Code ligatures in current buffer."
+    (setq-local prettify-symbols-alist fira-code-mode--old-prettify-alist)
+    (prettify-symbols-mode -1))
+
+  (define-minor-mode fira-code-mode
+    "Fira Code ligatures minor mode"
+    :lighter " Fira Code"
+    (setq-local prettify-symbols-unprettify-at-point 'right-edge)
+    (if fira-code-mode
+        (fira-code-mode--enable)
+      (fira-code-mode--disable)))
+
+  (defun fira-code-mode--setup ()
+    "Setup Fira Code Symbols"
+    (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol"))
+
+  (provide 'fira-code-mode)
+
+  (add-hook 'prog-mode-hook #'fira-code-mode)
+
+  (setq exec-path (cons "~/.pyenv/shims" exec-path))
+
+  (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+  )
 
 (defun launch-iterm ()
   (interactive)
