@@ -26,7 +26,7 @@ zsh_wifi_signal(){
                 [[ $speed -lt 50 ]] && color='%F{red}'
                 [[ $speed -eq 0 ]] && color='%F{blue}'
 
-                echo -n "%{$color%}$speed Mbps \uf1eb%f" # removed char not in my PowerLine font
+                echo -n "%{$color%}$speed Mbps \uf1eb%f"
         fi
 }
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
