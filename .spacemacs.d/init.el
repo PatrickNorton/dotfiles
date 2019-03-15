@@ -410,7 +410,7 @@ It should only modify the values of Spacemacs settings."
    ;; %z - mnemonics of buffer, terminal, and keyboard coding systems
    ;; %Z - like %z, but including the end-of-line format
    ;; (default "%I@%S")
-   dotspacemacs-frame-title-format "%I@%S"
+   dotspacemacs-frame-title-format "%m - %a"
 
    ;; Format specification for setting the icon title format
    ;; (default nil - same as frame-title-format)
@@ -464,69 +464,9 @@ configuration.
 Put your configuration code here, except for variables that should be set
 before packages are loaded."
 
-  ;; (defun fira-code-mode--make-alist (list)
-  ;;   "Generate prettify-symbols alist from LIST."
-  ;;   (let ((idx -1))
-  ;;     (mapcar
-  ;;      (lambda (s)
-  ;;        (setq idx (1+ idx))
-  ;;        (let* ((code (+ #Xe100 idx))
-  ;;               (width (string-width s))
-  ;;               (prefix ())
-  ;;               (suffix '(?\s (Br . Br)))
-  ;;               (n 1))
-  ;;          (while (< n width)
-  ;;            (setq prefix (append prefix '(?\s (Br . Bl))))
-  ;;            (setq n (1+ n)))
-  ;;          (cons s (append prefix suffix (list (decode-char 'ucs code))))))
-  ;;      list)))
-
-  ;; (defconst fira-code-mode--ligatures
-  ;;   '("www" "**" "***" "**/" "*>" "*/" "\\\\" "\\\\\\"
-  ;;     "{-" "[]" "::" ":::" ":=" "!!" "!=" "!==" "-}"
-  ;;     "--" "---" "-->" "->" "->>" "-<" "-<<" "-~"
-  ;;     "#{" "#[" "##" "###" "####" "#(" "#?" "#_" "#_("
-  ;;     ".-" ".=" ".." "..<" "..." "?=" "??" ";;" "/*"
-  ;;     "/**" "/=" "/==" "/>" "//" "///" "&&" "||" "||="
-  ;;     "|=" "|>" "^=" "$>" "++" "+++" "+>" "=:=" "=="
-  ;;     "===" "==>" "=>" "=>>" "<=" "=<<" "=/=" ">-" ">="
-  ;;     ">=>" ">>" ">>-" ">>=" ">>>" "<*" "<*>" "<|" "<|>"
-  ;;     "<$" "<$>" "<!--" "<-" "<--" "<->" "<+" "<+>" "<="
-  ;;     "<==" "<=>" "<=<" "<>" "<<" "<<-" "<<=" "<<<" "<~"
-  ;;     "<~~" "</" "</>" "~@" "~-" "~=" "~>" "~~" "~~>" "%%"
-  ;;     "" ":" "+" "+" "*"))
-
-  ;; (defvar fira-code-mode--old-prettify-alist)
-
-  ;; (defun fira-code-mode--enable ()
-  ;;   "Enable Fira Code ligatures in current buffer."
-  ;;   (setq-local fira-code-mode--old-prettify-alist prettify-symbols-alist)
-  ;;   (setq-local prettify-symbols-alist (fira-code-mode--make-alist fira-code-mode--ligatures))
-  ;;   (prettify-symbols-mode t))
-
-  ;; (defun fira-code-mode--disable ()
-  ;;   "Disable Fira Code ligatures in current buffer."
-  ;;   (setq-local prettify-symbols-alist fira-code-mode--old-prettify-alist)
-  ;;   (prettify-symbols-mode -1))
-
-  ;; (define-minor-mode fira-code-mode
-  ;;   "Fira Code ligatures minor mode"
-  ;;   :lighter " Fira Code"
-  ;;   (setq-local prettify-symbols-unprettify-at-point 'right-edge)
-  ;;   (if fira-code-mode
-  ;;       (fira-code-mode--enable)
-  ;;     (fira-code-mode--disable)))
-
-  ;; (defun fira-code-mode--setup ()
-  ;;   "Setup Fira Code Symbols"
-  ;;   (set-fontset-font t '(#Xe100 . #Xe16f) "Fira Code Symbol"))
-
-  ;; (provide 'fira-code-mode)
-
-  ;; (add-hook 'prog-mode-hook #'fira-code-mode)
-
+  ;; Fira Code ligature integration
   (when (window-system)
-  (set-frame-font "Fira Code"))
+    (set-frame-font "Fira Code"))
   (let ((alist '((33 . ".\\(?:\\(?:==\\|!!\\)\\|[!=]\\)")
                  (35 . ".\\(?:###\\|##\\|_(\\|[#(?[_{]\\)")
                  (36 . ".\\(?:>\\)")
@@ -557,11 +497,26 @@ before packages are loaded."
       (set-char-table-range composition-function-table (car char-regexp)
                             `([,(cdr char-regexp) 0 font-shape-gstring]))))
 
+  ;; Turns off/on the Fira Code ligatures for helm, to prevent hanging.
   (add-hook 'helm-major-mode-hook
             (lambda ()
-              (setq auto-composition-mode nil)))
+              (setq-local auto-composition-mode nil)))
+
+  ;; Prevent ediff from hanging on GUI spacemacs.
+  ;; This turns off the ligatures in ediff.
+  (add-hook 'ediff-mode-hook
+            (lambda ()
+              (setq-local auto-composition-mode nil)))
 
   (setq exec-path (cons "~/.pyenv/shims" exec-path))
+
+  ;; Enable mouse support
+  (unless window-system
+    (global-set-key (kbd "<mouse-4>") 'scroll-down-line)
+    (global-set-key (kbd "<mouse-5>") 'scroll-up-line))
+
+  (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
+
   )
 
 (defun launch-iterm ()
@@ -614,7 +569,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ediff-current-diff-B ((t (:background "#553333" :slant italic))))
+ '(ediff-current-diff-B ((t (:background "#553333"))))
  '(ediff-even-diff-A ((t (:background "DarkOrange4"))))
  '(ediff-even-diff-B ((t (:background "DarkOrange4"))))
  '(ediff-fine-diff-B ((t (:background "red4"))))
