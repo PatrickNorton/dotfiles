@@ -2,6 +2,8 @@
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
+;;; Code:
+
 (defun dotspacemacs/layers ()
   "Layer configuration:
 This function should only modify configuration layer settings."
@@ -33,31 +35,38 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '(
+   '(rust
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
-     ;; ----------------------------------------------------------------
+     ;; ---------------------------------------------------------------
      helm
      auto-completion
      ;; better-defaults
+     common-lisp
      debug
      emacs-lisp
+     games
      git
      html
      javascript
+     (latex :variables
+            TeX-view-program-selection '((output-pdf "PDF Tools")))
      markdown
      multiple-cursors
      org
+     pdf
      python
      treemacs
+     scheme
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
      ;; spell-checking
      syntax-checking
-     ;; version-control
+     version-control
+     xkcd
      )
 
    ;; List of additional packages that will be installed without being
@@ -67,7 +76,7 @@ This function should only modify configuration layer settings."
    ;; To use a local version of a package, use the `:location' property:
    ;; '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '(scroll-restore)
+   dotspacemacs-additional-packages '(scroll-restore realgud minimap)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -353,7 +362,12 @@ It should only modify the values of Spacemacs settings."
    ;;                       text-mode
    ;;   :size-limit-kb 1000)
    ;; (default nil)
-   dotspacemacs-line-numbers t
+   dotspacemacs-line-numbers '(:disabled-for-modes dired-mode
+                                                   doc-view-mode
+                                                   markdown-mode
+                                                   org-mode
+                                                   pdf-view-mode
+                                                   :size-limit-kb 1000)
 
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
@@ -517,27 +531,42 @@ before packages are loaded."
 
   (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode)
 
+  (add-hook 'lisp-mode-hook #'aggressive-indent-mode)
+
+  (setq inferior-lisp-program "/usr/local/bin/clisp")
+
+  (setq create-lockfiles nil)
+
+  (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+
+  ;; (add-hook 'after-init-hook #'global-flycheck-mode)
+
+  (add-hook 'shell-script-mode-hook #'syntax-checking/init-flycheck)
   )
 
 (defun launch-iterm ()
+  "Launch iterm from Emacs."
   (interactive)
   (shell-command "open -a iTerm"))
 
 (global-set-key (kbd "s-\\") 'launch-iterm)
 
 (defun launch-calculator ()
+  "Launch calculator."
   (interactive)
   (shell-command "open -a Calculator"))
 
 (global-set-key (kbd "C-s-c") 'launch-calculator)
 
 (defun launch-emacs ()
+  "Launch Emacs from Emacs."
   (interactive)
   (shell-command "open -a Emacs"))
 
 (global-set-key (kbd "C-s-e") 'launch-emacs)
 
 (defun open-system-preferences ()
+  "Open settings from Emacs."
   (interactive)
   (shell-command "open -a System\\ Preferences"))
 
@@ -549,30 +578,32 @@ before packages are loaded."
 
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 
+(load "~/Projects/dotfiles/.spacemacs.d/nlang")
 
+(load "~/explain-pause-mode/explain-pause-mode")
 
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
 Emacs customize menu instead.
 This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (helm-xref helm-purpose helm-org-rifle helm-gitignore helm-git-grep helm-css-scss smeargle gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link magit transient git-commit with-editor web-mode tagedit slim-mode scss-mode sass-mode pug-mode haml-mode emmet-mode company-web web-completion-data scroll-restore web-beautify org-projectile org-category-capture org-present mmm-mode markdown-toc markdown-mode livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc gh-md flyspell-correct-ivy flyspell-correct company-tern tern coffee-mode auto-dictionary xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help wgrep smex ivy-hydra counsel-projectile counsel swiper ivy helm-company helm-c-yasnippet fuzzy company-statistics company-anaconda company auto-yasnippet yasnippet ac-ispell auto-complete flycheck-pos-tip pos-tip flycheck org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot atom-one-dark-theme yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ediff-current-diff-B ((t (:background "#553333"))))
- '(ediff-even-diff-A ((t (:background "DarkOrange4"))))
- '(ediff-even-diff-B ((t (:background "DarkOrange4"))))
- '(ediff-fine-diff-B ((t (:background "red4"))))
- '(ediff-odd-diff-A ((t (:background "DarkOrange4"))))
- '(ediff-odd-diff-B ((t (:background "DarkOrange4")))))
-)
+  (custom-set-variables
+   ;; custom-set-variables was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(package-selected-packages
+     (quote
+      (git-gutter-fringe+ fringe-helper git-gutter+ browse-at-remote pdf-tools tablist toml-mode racer helm-gtags ggtags flycheck-rust counsel-gtags cargo rust-mode company-auctex auctex-latexmk auctex geiser minimap xkcd typit mmt sudoku pacmacs 2048-game helm-xref helm-purpose helm-org-rifle helm-gitignore helm-git-grep helm-css-scss smeargle gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link magit transient git-commit with-editor web-mode tagedit slim-mode scss-mode sass-mode pug-mode haml-mode emmet-mode company-web web-completion-data scroll-restore web-beautify org-projectile org-category-capture org-present mmm-mode markdown-toc markdown-mode livid-mode skewer-mode simple-httpd json-mode json-snatcher json-reformat js2-refactor multiple-cursors js2-mode js-doc gh-md flyspell-correct-ivy flyspell-correct company-tern tern coffee-mode auto-dictionary xterm-color shell-pop multi-term eshell-z eshell-prompt-extras esh-help wgrep smex ivy-hydra counsel-projectile counsel swiper ivy helm-company helm-c-yasnippet fuzzy company-statistics company-anaconda company auto-yasnippet yasnippet ac-ispell auto-complete flycheck-pos-tip pos-tip flycheck org-pomodoro alert log4e gntp org-mime org-download htmlize gnuplot atom-one-dark-theme yapfify pyvenv pytest pyenv-mode py-isort pip-requirements live-py-mode hy-mode dash-functional helm-pydoc cython-mode anaconda-mode pythonic ws-butler winum which-key volatile-highlights vi-tilde-fringe uuidgen use-package toc-org spaceline powerline restart-emacs request rainbow-delimiters popwin persp-mode pcre2el paradox spinner org-plus-contrib org-bullets open-junk-file neotree move-text macrostep lorem-ipsum linum-relative link-hint indent-guide hydra hungry-delete hl-todo highlight-parentheses highlight-numbers parent-mode highlight-indentation helm-themes helm-swoop helm-projectile helm-mode-manager helm-make projectile pkg-info epl helm-flx helm-descbinds helm-ag google-translate golden-ratio flx-ido flx fill-column-indicator fancy-battery eyebrowse expand-region exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-search-highlight-persist evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-lisp-state smartparens evil-indent-plus evil-iedit-state iedit evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg undo-tree eval-sexp-fu highlight elisp-slime-nav dumb-jump f dash s diminish define-word column-enforce-mode clean-aindent-mode bind-map bind-key auto-highlight-symbol auto-compile packed aggressive-indent adaptive-wrap ace-window ace-link ace-jump-helm-line helm avy helm-core popup async))))
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(ediff-current-diff-B ((t (:background "#553333"))))
+   '(ediff-even-diff-A ((t (:background "DarkOrange4"))))
+   '(ediff-even-diff-B ((t (:background "DarkOrange4"))))
+   '(ediff-fine-diff-B ((t (:background "red4"))))
+   '(ediff-odd-diff-A ((t (:background "DarkOrange4"))))
+   '(ediff-odd-diff-B ((t (:background "DarkOrange4")))))
+  )
