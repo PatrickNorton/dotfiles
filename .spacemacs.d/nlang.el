@@ -136,7 +136,7 @@
 (defun nlang-mode:calculate-indent-of-multiline-comment ()
   (back-to-indentation)
   (let ((comment-beginning-pos (nth 8 syntax-ppss))
-        (starts-with-pipe (eq (char-after ?|))))
+        (starts-with-pipe (eq (char-after) ?|)))
     (forward-line -1)
     (back-to-indentation)
     (cond
@@ -193,7 +193,7 @@
           (- (point) (save-excursion (beginning-of-line) (point))))
          (end-brace-p
           (and (not (eolp))
-               (looking-at (regexp-opt-charset '(?} ?\] ?\)))))))
+               (seq-contains '(?} ?\] ?\)) (char-after)))))
      (save-excursion
        (forward-line -1)
        (back-to-indentation)
@@ -206,8 +206,9 @@
          (forward-line -1)
          (back-to-indentation))
        (let* ((line-ends-with-open
-               (save-excursion (end-of-line) (forward-char -1)
-                               (looking-at (regexp-opt-charset '(?\( ?\[ ?{)))))
+               (save-excursion
+                 (end-of-line)
+                 (seq-contains '(?\( ?\[ ?{) (char-before))))
               (last-braces (nth 0 (syntax-ppss)))
               (last-indent
                (- (point) (save-excursion (beginning-of-line) (point))))
