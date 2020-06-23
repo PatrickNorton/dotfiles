@@ -234,4 +234,4 @@ reload() {
 # }
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-export HOMEBREW_GITHUB_API_TOKEN=bcfe52b38eb614954285c5ea1524b8d858ab0d19
+export HOMEBREW_GITHUB_API_TOKEN=$(cat ~/Projects/dotfiles/brew-git-token.txt)
