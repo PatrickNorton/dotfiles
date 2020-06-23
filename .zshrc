@@ -1,15 +1,25 @@
+# Ensure that the terminal uses 256 colors
+export TERM="xterm-256color"
+
 # zmodload zsh/zprof
 # If you come from bash you might have to change your $PATH.
-export PATH=$HOME/bin:/usr/local/bin:$PATH
+export PATH=$HOME/bin:/usr/local/bin:$PATH:/Users/patricknorton/.local/bin:/Users/patricknorton/opt/GNAT/2018/bin/:$HOME/.cargo/bin
 
 # Path to your oh-my-zsh installation.
-export ZSH="/Users/patricknorton/.oh-my-zsh"
+export ZSH=/Users/patricknorton/.oh-my-zsh
+
+# Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
+# Initialization code that may require console input (password prompts, [y/n]
+# confirmations, etc.) must go above this block, everything else may go below.
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+    source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
 
 # Set name of the theme to load --- if set to "random", it will
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
-ZSH_THEME="powerlevel9k/powerlevel9k"
+ZSH_THEME=powerlevel10k/powerlevel10k
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -99,8 +109,8 @@ source $ZSH/oh-my-zsh.sh
 # export SSH_KEY_PATH="~/.ssh/rsa_id"
 
 # Setting up pyenv
-export PYENV_ROOT="$HOME/.pyenv"
-export PATH="$PYENV_ROOT/bin:$PATH"
+export PYENV_ROOT=$HOME/.pyenv
+export PATH=$PYENV_ROOT/bin:$PATH
 eval "$(pyenv init -)"
 eval "$(pyenv virtualenv-init -)"
 
@@ -120,6 +130,8 @@ eval "$(pyenv virtualenv-init -)"
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
+export NEWLANG_PATH=""
+
 alias a2weather='ansiweather -l "Ann Arbor,US" -s true -d true'
 
 alias weather=ansiweather
@@ -130,8 +142,6 @@ alias airport='/System/Library/PrivateFrameworks/Apple80211.framework/Versions/C
 
 alias tree="tree -C"
 
-alias pip=pip3
-
 alias menuscript='~/Desktop/Python\ files/Lunchdisper.py'
 
 alias wisecow='fortune | cowsay'
@@ -140,57 +150,88 @@ alias git=hub
 
 alias emptygit=4b825dc642cb6eb9a060e54bf8d69288fbee4904
 
-alias factor=gfactor
+alias please=sudo
 
 
 # Personal functions
 
-calculator(){
-    python ~/Desktop/Python\ files/Sympymath.py
+sympy() {
+    python ~/Projects/Python\ files/Sympymath.py
 }
 
-sysinfo(){
+sysinfo() {
     open /Applications/Utilities/System\ Information.app
 }
 
-lunch(){
+lunch() {
     python menuscript
 }
 
-solitaire(){
-    python ~/Desktop/Python\ files/Solitaire.py
+solitaire() {
+    python ~/Projects/Python\ files/Solitaire4.py
 }
 
-hangman(){
-    python ~/Desktop/Python\ files/Hangman.py
+chess() {
+    python ~/Projects/Python\ files/Ultrachess.py
 }
 
-chess(){
-    python ~/Desktop/Python\ files/Ultrachess.py
-}
-
-compose(){
+compose() {
     open -a Musescore\ 3
 }
 
-rechrome(){
-    open -a Google\ Chrome --args --force-dark-mode
+emptydiff() {
+    git diff --stat $githash $emptygit
 }
 
-emptygitfn(){
-    echo 4b825dc642cb6eb9a060e54bf8d69288fbee4904
-}
-
-emptydiff(){
-    git diff --stat $(emptygitfn)
-}
-
-githash(){
+githash() {
     git rev-parse HEAD
 }
 
-clocgit(){
-    cloc $(git rev-parse HEAD)
+clocgit() {
+    cloc $@ $(git rev-parse HEAD)
 }
 
+old-words() {
+    (cd ~/words && ./words $@)
+}
+
+words() {
+    (cd ~/whitakers-words && bin/words $@)
+}
+
+brewgrade() {
+    brew upgrade
+    brew cask upgrade
+}
+
+randint() {
+    if [[ $# -eq 1 ]]; then
+        shuf -i 0-$1 -n 1
+    else
+        shuf -i $1-$2 -n 1
+    fi
+}
+
+shouldi () {
+    if (( $RANDOM % 2 )); then
+        echo yes
+    else
+        echo no
+    fi
+}
+
+reload() {
+    source ~/.zshrc
+}
+
+# newlang() {
+#     local file=$1
+#     $(cd ~/IdeaProjects/Compiler/out/production/Compiler && java -cp . main.java.parser.Compiler "$file" > /dev/null)
+#     if $?; then
+#         local bytecode=${file%.*}
+#         ~/CLionProjects/Runtime/cmake-build-debug/Runtime "${bytecode}.nbyte"
+#     fi
+# }
+
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+export HOMEBREW_GITHUB_API_TOKEN=bcfe52b38eb614954285c5ea1524b8d858ab0d19
