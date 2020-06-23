@@ -185,7 +185,6 @@
 (defun nlang-mode:calculate-code-indent ()
   "Return the indentation of the current line outside multiline comments."
   (back-to-indentation)
-  (what-line)
   (nlang-mode:indentation
    (point)
    (let ((net-braces (nth 0 (syntax-ppss)))
