@@ -8,7 +8,7 @@
                            "casted" "switch" "case" "enum" "default" "defer" "var" "sync" "nobreak"
                            "generic" "union"))
              (x-descriptors '("public" "private" "protected" "mut" "mref" "readonly" "const" "nonfinal" "final"
-                              "pubget" "static" "generator" "synced" "native"))
+                              "pubget" "static" "generator" "synced" "native" "auto"))
              (x-types '("dec" "int" "list" "dict" "str" "set" "char" "bool"))
              (x-builtins '("true" "false" "null" "self" "cls"))
              (x-events '("at_rot_target" "at_target" "attach"))
