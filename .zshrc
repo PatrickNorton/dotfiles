@@ -224,6 +224,10 @@ reload() {
     source ~/.zshrc
 }
 
+pull-spacemacs() {
+    (cd ~/.emacs.d && git pull origin develop)
+}
+
 # newlang() {
 #     local file=$1
 #     $(cd ~/IdeaProjects/Compiler/out/production/Compiler && java -cp . main.java.parser.Compiler "$file" > /dev/null)
