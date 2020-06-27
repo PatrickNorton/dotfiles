@@ -200,7 +200,7 @@
          ;; Ignore all blank lines (stop at beginning of file)
          (forward-line -1)
          (back-to-indentation))
-       (while (nth 2 (syntax-ppss))
+       (while (nth 4 (syntax-ppss))
          ;; In a multiline comment, go back to comment start
          (forward-line -1)
          (back-to-indentation))
@@ -208,13 +208,19 @@
                (save-excursion
                  (end-of-line)
                  (seq-contains '(?\( ?\[ ?{) (char-before))))
+              (line-starts-with-close
+               (seq-contains '(?\) ?\] ?}) (char-after)))
               (last-braces (nth 0 (syntax-ppss)))
               (last-indent
                (- (point) (save-excursion (beginning-of-line) (point))))
               (indent-delta
-               (if (and end-brace-p (not line-ends-with-open))
-                   (* nlang-mode:indent-depth (- net-braces last-braces 1))
-                 (* nlang-mode:indent-depth (- net-braces last-braces)))))
+               (if line-starts-with-close
+                   (if (and end-brace-p (not line-ends-with-open))
+                       (* nlang-mode:indent-depth (- net-braces last-braces))
+                     (* nlang-mode:indent-depth (- net-braces last-braces -1)))
+                 (if (and end-brace-p (not line-ends-with-open))
+                     (* nlang-mode:indent-depth (- net-braces last-braces 1))
+                   (* nlang-mode:indent-depth (- net-braces last-braces))))))
          (- (+ last-indent indent-delta) current-indent))))))
 
 (defun nlang-mode:calculate-indent-of-multiline-string ()
