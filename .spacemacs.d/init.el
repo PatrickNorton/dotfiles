@@ -582,6 +582,9 @@ before packages are loaded."
 
 (load "~/explain-pause-mode/explain-pause-mode")
 
+(defun load-current-file ()
+  (load-file buffer-file-name))
+
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
 This is an auto-generated function, do not modify its content directly, use
