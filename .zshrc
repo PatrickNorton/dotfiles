@@ -201,7 +201,7 @@ words() {
 
 brewgrade() {
     brew upgrade
-    brew cask upgrade
+    brew upgrade --cask
 }
 
 randint() {
